@@ -1,7 +1,7 @@
 {
     "name": "tmilos/scim-filter-parser",
     "description": "SCIM AST filter parser library",
-    "keywords": ["SCIM", "AST", "parser", "SCIM parser", "SCIM filter parser", "SCIM AST"],
+    "keywords": ["SCIM", "AST", "parser", "SCIM parser", "SCIM filter parser", "SCIM AST", "simplecloud"],
     "license": "MIT",
     "authors": [
         {
