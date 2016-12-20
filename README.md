@@ -16,14 +16,15 @@ found on http://www.simplecloud.info/ website.
 $parser = new Parser();
 $node = $parser->parse('userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")');
 /*
-    walk the node...
-    Conjunction = {
-        ComparisonExpression => userType eq Employee
-        Disjunction => {
-            ComparisonExpression => emails co example.com
-            ComparisonExpression => emails.value co example.org
-        }
+walk the node...
+
+Conjunction = {
+    ComparisonExpression => userType eq Employee
+    Disjunction => {
+        ComparisonExpression => emails co example.com
+        ComparisonExpression => emails.value co example.org
     }
+}
 */
 ```
 
