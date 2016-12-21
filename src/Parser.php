@@ -243,7 +243,6 @@ class Parser
             $ts = gmmktime($hour, $minute, $second, $month, $day, $year);
 
             $value = new \DateTime('@'.$ts, new \DateTimeZone('UTC'));
-            //$value->setTimestamp($ts);
         }
 
         return $value;
