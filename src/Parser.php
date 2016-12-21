@@ -21,9 +21,32 @@ class Parser
     /** @var Lexer */
     private $lexer;
 
+    /** @var Version */
+    private $version;
+
+    /** @var bool */
+    private $inValuePath;
+
     public function __construct()
     {
         $this->lexer = new Lexer(new LexerArrayConfig(LexerConfigFactory::getConfig()));
+        $this->version = Version::V2();
+    }
+
+    /**
+     * @return Version
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param Version $version
+     */
+    public function setVersion(Version $version)
+    {
+        $this->version = $version;
     }
 
     /**
@@ -33,6 +56,7 @@ class Parser
      */
     public function parse($input)
     {
+        $this->inValuePath = false;
         $this->lexer->setInput($input);
         $this->lexer->moveNext();
 
@@ -113,7 +137,30 @@ class Parser
             return $filter;
         }
 
+        if ($this->version->equals(Version::V2()) && !$this->inValuePath) {
+            $tokenAfterAttributePath = $this->lexer->peekWhileTokens([Tokens::T_ATTR_NAME, Tokens::T_DOT]);
+            $this->lexer->resetPeek();
+            if ($tokenAfterAttributePath->is(Tokens::T_BRACKET_OPEN)) {
+                return $this->valuePath();
+            }
+        }
+
         return $this->comparisionExpression();
+    }
+
+    /**
+     * @return Ast\ValuePath
+     */
+    private function valuePath()
+    {
+        $attributePath = $this->attributePath();
+        $this->match(Tokens::T_BRACKET_OPEN);
+        $this->inValuePath = true;
+        $filter = $this->disjunction();
+        $this->match(Tokens::T_BRACKET_CLOSE);
+        $this->inValuePath = false;
+
+        return new Ast\ValuePath($attributePath, $filter);
     }
 
     /**

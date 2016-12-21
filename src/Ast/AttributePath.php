@@ -29,7 +29,7 @@ class AttributePath extends Node
     public function dump()
     {
         return [
-            'AttributePath: '.implode('.', $this->attributeNames),
+            'AttributePath' => implode('.', $this->attributeNames),
         ];
     }
 }

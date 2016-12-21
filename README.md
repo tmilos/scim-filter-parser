@@ -30,3 +30,10 @@ Conjunction = {
 
 For more details look at the [unit tests](tests/ParserTest.php).
 
+
+# SCIM version
+
+SCIM filter between versions v1 and v2 remained almost the same, with the difference that v2 introduced new ValuePath syntax.
+Parser is by default in v2 mode, and you can switch it to v1 with ``Parser::setVersion(Version::V1())`` when it will throw syntax
+errors when brackets are encountered.
+

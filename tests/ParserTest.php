@@ -4,6 +4,7 @@ namespace Tests\Tmilos\ScimFilterParser;
 
 use Tmilos\ScimFilterParser\Error\FilterException;
 use Tmilos\ScimFilterParser\Parser;
+use Tmilos\ScimFilterParser\Version;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -103,6 +104,66 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ],
 
             [
+                'emails[type eq "work"]',
+                [
+                    'ValuePath' => [
+                        ['AttributePath' => 'emails'],
+                        ['ComparisonExpression' => 'type eq work'],
+                    ],
+                ]
+            ],
+
+            [
+                'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
+                [
+                    'Conjunction' => [
+                        ['ComparisonExpression' => 'userType eq Employee'],
+                        [
+                            'ValuePath' => [
+                                ['AttributePath' => 'emails'],
+                                [
+                                    'Conjunction' => [
+                                        ['ComparisonExpression' => 'type eq work'],
+                                        ['ComparisonExpression' => 'value co @example.com'],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+
+            [
+                'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
+                [
+                    'Disjunction' => [
+                        [
+                            'ValuePath' => [
+                                ['AttributePath' => 'emails'],
+                                [
+                                    'Conjunction' => [
+                                        ['ComparisonExpression' => 'type eq work'],
+                                        ['ComparisonExpression' => 'value co @example.com'],
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'ValuePath' => [
+                                ['AttributePath' => 'ims'],
+                                [
+                                    'Conjunction' => [
+                                        ['ComparisonExpression' => 'type eq xmpp'],
+                                        ['ComparisonExpression' => 'value co @foo.com'],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+
+            [
                 'username eq "john" and name sw "mike"',
                 [
                     'Conjunction' => [
@@ -188,6 +249,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ['username xx "mike"', "[Syntax Error] line 0, col 9: Error: Expected comparision operator, got 'xx'"],
             ['username eq', "[Syntax Error] line 0, col 9: Error: Expected SP, got end of string."],
             ['username eq ', "[Syntax Error] line 0, col 11: Error: Expected comparison value, got end of string."],
+            ['emails[type[value eq "1"]]', "[Syntax Error] line 0, col 11: Error: Expected SP, got '['"],
         ];
     }
 
@@ -200,5 +262,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionMessage($expectedMessage);
         $parser = new Parser();
         $parser->parse($filterString);
+    }
+
+    /**
+     * @expectedException \Tmilos\ScimFilterParser\Error\FilterException
+     * @expectedExceptionMessage [Syntax Error] line 0, col 6: Error: Expected SP, got '['
+     */
+    public function test_v1_no_value_path()
+    {
+        $parser = new Parser();
+        $parser->setVersion(Version::V1());
+        $parser->parse('emails[type eq "work"]');
     }
 }
