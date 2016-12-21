@@ -9,6 +9,7 @@ found on http://www.simplecloud.info/ website.
 [![Quality Score](https://img.shields.io/scrutinizer/g/tmilos/scim-filter-parser.svg?style=flat-square)](https://scrutinizer-ci.com/g/tmilos/scim-filter-parser)
 [![License](https://img.shields.io/packagist/l/tmilos/scim-filter-parser.svg)](https://packagist.org/packages/tmilos/scim-filter-parser)
 [![Packagist Version](https://img.shields.io/packagist/v/tmilos/scim-filter-parser.svg?style=flat-square)](https://packagist.org/packages/tmilos/scim-filter-parser)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cc1043a0-daa9-481b-9840-109bdb43543b/mini.png)](https://insight.sensiolabs.com/projects/cc1043a0-daa9-481b-9840-109bdb43543b)
 
 
 # Usage
