@@ -80,5 +80,5 @@ constructor argument. In v1 mode it will throw syntax errors when brackets are e
 ```php
 <?php
 $parser = new Parser(Mode::FILTER, Version::V1());
-$parser->parse('members.value'); // throws ParseException - Col 8: Expected SP, but got end of string
+$parser->parse('emails[type eq "work"]'); // throws ParseException - Col 6: Expected SP, got '['
 ```
