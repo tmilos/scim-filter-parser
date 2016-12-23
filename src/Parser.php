@@ -45,6 +45,22 @@ class Parser
     }
 
     /**
+     * @return Mode
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    /**
+     * @param Mode $mode
+     */
+    public function setMode(Mode $mode)
+    {
+        $this->mode = $mode;
+    }
+
+    /**
      * @return Version
      */
     public function getVersion()

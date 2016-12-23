@@ -251,6 +251,7 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
             ['username eq', "[Syntax Error] line 0, col 9: Error: Expected SP, got end of string."],
             ['username eq ', "[Syntax Error] line 0, col 11: Error: Expected comparison value, got end of string."],
             ['emails[type[value eq "1"]]', "[Syntax Error] line 0, col 11: Error: Expected SP, got '['"],
+            ['members.value', '[Syntax Error] line 0, col 8: Error: Expected SP, got end of string.'],
         ];
     }
 
