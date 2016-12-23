@@ -7,7 +7,7 @@ use Tmilos\ScimFilterParser\Error\FilterException;
 use Tmilos\ScimFilterParser\Mode;
 use Tmilos\ScimFilterParser\Parser;
 
-class ParserPathModelTest extends \PHPUnit_Framework_TestCase
+class ParserPathModeTest extends \PHPUnit_Framework_TestCase
 {
     public function valid_path_provider()
     {
