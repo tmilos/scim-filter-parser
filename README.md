@@ -4,7 +4,7 @@ The PHP parser for SCIM filter. SCIM stands for System for Cross-domain Identity
 found on http://www.simplecloud.info/ website.
 
 [![Author](http://img.shields.io/badge/author-@tmilos-blue.svg?style=flat-square)](https://twitter.com/tmilos77)
-[![Build Status](https://travis-ci.org/tmilos/scim-filter-parser.svg?branch=master)](https://travis-ci.org/tmilos/scim-fitrer-parser)
+[![Build Status](https://travis-ci.org/tmilos/scim-filter-parser.svg?branch=master)](https://travis-ci.org/tmilos/scim-filter-parser)
 [![Coverage Status](https://coveralls.io/repos/github/tmilos/scim-filter-parser/badge.svg?branch=master)](https://coveralls.io/github/tmilos/scim-filter-parser?branch=master)
 [![Quality Score](https://img.shields.io/scrutinizer/g/tmilos/scim-filter-parser.svg?style=flat-square)](https://scrutinizer-ci.com/g/tmilos/scim-filter-parser)
 [![License](https://img.shields.io/packagist/l/tmilos/scim-filter-parser.svg)](https://packagist.org/packages/tmilos/scim-filter-parser)
