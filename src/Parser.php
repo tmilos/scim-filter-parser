@@ -39,7 +39,7 @@ class Parser
         $this->lexer = new Lexer(new LexerArrayConfig(LexerConfigFactory::getConfig()));
         $this->version = $version ?: Version::V2();
         $this->mode = $mode ?: Mode::FILTER();
-        if ($this->mode->equals(Mode::PATH) && $this->version->equals(Version::V2)) {
+        if ($this->mode->equals(Mode::PATH) && !$this->version->equals(Version::V2)) {
             throw new \InvalidArgumentException('Path mode is available only in SCIM version 2');
         }
     }
@@ -75,12 +75,31 @@ class Parser
         if ($this->mode->equals(Mode::FILTER)) {
             $node = $this->disjunction();
         } else {
-            throw new \LogicException('Not implemented');
+            $node = $this->path();
         }
 
         $this->match(null);
 
         return $node;
+    }
+
+    /**
+     * @return Ast\Path
+     */
+    private function path()
+    {
+        if ($this->isValuePathIncoming()) {
+            $valuePath = $this->valuePath();
+            $attributePath = null;
+            if ($this->lexer->isNextToken(Tokens::T_DOT)) {
+                $this->match(Tokens::T_DOT);
+                $attributePath = $this->attributePath();
+            }
+
+            return Ast\Path::fromValuePath($valuePath, $attributePath);
+        }
+
+        return Ast\Path::fromAttributePath($this->attributePath());
     }
 
     /**
@@ -158,9 +177,7 @@ class Parser
         }
 
         if ($this->version->equals(Version::V2()) && !$this->inValuePath) {
-            $tokenAfterAttributePath = $this->lexer->peekWhileTokens([Tokens::T_ATTR_NAME, Tokens::T_DOT]);
-            $this->lexer->resetPeek();
-            if ($tokenAfterAttributePath->is(Tokens::T_BRACKET_OPEN)) {
+            if ($this->isValuePathIncoming()) {
                 return $this->valuePath();
             }
         }
@@ -266,6 +283,17 @@ class Parser
         }
 
         return $value;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isValuePathIncoming()
+    {
+        $tokenAfterAttributePath = $this->lexer->peekWhileTokens([Tokens::T_ATTR_NAME, Tokens::T_DOT]);
+        $this->lexer->resetPeek();
+
+        return $tokenAfterAttributePath ? $tokenAfterAttributePath->is(Tokens::T_BRACKET_OPEN) : false;
     }
 
     private function match($tokenName)

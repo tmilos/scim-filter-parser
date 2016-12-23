@@ -3,12 +3,13 @@
 namespace Tests\Tmilos\ScimFilterParser;
 
 use Tmilos\ScimFilterParser\Error\FilterException;
+use Tmilos\ScimFilterParser\Mode;
 use Tmilos\ScimFilterParser\Parser;
 use Tmilos\ScimFilterParser\Version;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
 {
-    public function parser_provider()
+    public function parser_provider_v2()
     {
         return [
             [
@@ -233,16 +234,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider parser_provider
+     * @dataProvider parser_provider_v2
      */
-    public function test_parser($filterString, array $expectedDump)
+    public function test_parser_v2($filterString, array $expectedDump)
     {
-        $parser = new Parser();
+        $parser = $this->getParser();
         $node = $parser->parse($filterString);
         $this->assertEquals($expectedDump, $node->dump(), sprintf("\n\n%s\n%s\n\n", $filterString, json_encode($node->dump(), JSON_PRETTY_PRINT)));
     }
 
-    public function error_provider()
+    public function error_provider_v2()
     {
         return [
             ['not a valid filter', "[Syntax Error] line 0, col 4: Error: Expected PAREN_OPEN, got 'a'"],
@@ -254,13 +255,13 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider error_provider
+     * @dataProvider error_provider_v2
      */
-    public function test_error($filterString, $expectedMessage, $expectedException = FilterException::class)
+    public function test_error_v2($filterString, $expectedMessage, $expectedException = FilterException::class)
     {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMessage);
-        $parser = new Parser();
+        $parser = $this->getParser();
         $parser->parse($filterString);
     }
 
@@ -270,8 +271,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function test_v1_no_value_path()
     {
-        $parser = new Parser();
-        $parser->setVersion(Version::V1());
+        $parser = $this->getParser(Version::V1());
         $parser->parse('emails[type eq "work"]');
     }
 
@@ -281,8 +281,20 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function test_throws_error_for_value_path_with_attribute_path_in_filter_mode()
     {
-        $parser = new Parser();
+        $parser = $this->getParser();
         $node = $parser->parse('addresses[type eq "work"].streetAddress co "main"');
         var_dump($node->dump());
+    }
+
+    /**
+     * @param Version $version
+     *
+     * @return Parser
+     */
+    private function getParser(Version $version = null)
+    {
+        $version = $version ?: Version::V2();
+
+        return new Parser(Mode::FILTER(), $version);
     }
 }
