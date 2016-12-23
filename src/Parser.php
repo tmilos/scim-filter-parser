@@ -24,13 +24,24 @@ class Parser
     /** @var Version */
     private $version;
 
+    /** @var Mode */
+    private $mode;
+
     /** @var bool */
     private $inValuePath;
 
-    public function __construct()
+    /**
+     * @param Mode    $mode
+     * @param Version $version
+     */
+    public function __construct(Mode $mode = null, Version $version = null)
     {
         $this->lexer = new Lexer(new LexerArrayConfig(LexerConfigFactory::getConfig()));
-        $this->version = Version::V2();
+        $this->version = $version ?: Version::V2();
+        $this->mode = $mode ?: Mode::FILTER();
+        if ($this->mode->equals(Mode::PATH) && $this->version->equals(Version::V2)) {
+            throw new \InvalidArgumentException('Path mode is available only in SCIM version 2');
+        }
     }
 
     /**
@@ -60,7 +71,16 @@ class Parser
         $this->lexer->setInput($input);
         $this->lexer->moveNext();
 
-        return $this->disjunction();
+        $node = null;
+        if ($this->mode->equals(Mode::FILTER)) {
+            $node = $this->disjunction();
+        } else {
+            throw new \LogicException('Not implemented');
+        }
+
+        $this->match(null);
+
+        return $node;
     }
 
     /**
@@ -250,11 +270,17 @@ class Parser
 
     private function match($tokenName)
     {
-        if (!$this->lexer->getLookahead() || !$this->lexer->getLookahead()->is($tokenName)) {
-            $this->syntaxError($tokenName);
-        }
+        if (null === $tokenName) {
+            if ($this->lexer->getLookahead()) {
+                $this->syntaxError('end of input');
+            }
+        } else {
+            if (!$this->lexer->getLookahead() || !$this->lexer->getLookahead()->is($tokenName)) {
+                $this->syntaxError($tokenName);
+            }
 
-        $this->lexer->moveNext();
+            $this->lexer->moveNext();
+        }
     }
 
     private function syntaxError($expected = '', Token $token = null)

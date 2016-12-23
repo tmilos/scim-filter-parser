@@ -274,4 +274,15 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->setVersion(Version::V1());
         $parser->parse('emails[type eq "work"]');
     }
+
+    /**
+     * @expectedException \Tmilos\ScimFilterParser\Error\FilterException
+     * @expectedExceptionMessage [Syntax Error] line 0, col 25: Error: Expected end of input, got '.'
+     */
+    public function test_throws_error_for_value_path_with_attribute_path_in_filter_mode()
+    {
+        $parser = new Parser();
+        $node = $parser->parse('addresses[type eq "work"].streetAddress co "main"');
+        var_dump($node->dump());
+    }
 }
