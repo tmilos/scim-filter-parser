@@ -13,6 +13,9 @@ namespace Tmilos\ScimFilterParser\Ast;
 
 class AttributePath extends Node
 {
+    /** @var string */
+    public $schema;
+
     /** @var string[] */
     public $attributeNames = [];
 
@@ -23,13 +26,17 @@ class AttributePath extends Node
 
     public function __toString()
     {
+        if ($this->schema) {
+            return $this->schema.' : '.implode('.', $this->attributeNames);
+        }
+
         return implode('.', $this->attributeNames);
     }
 
     public function dump()
     {
         return [
-            'AttributePath' => implode('.', $this->attributeNames),
+            'AttributePath' => $this->__toString(),
         ];
     }
 }

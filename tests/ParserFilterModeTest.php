@@ -28,6 +28,11 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
             ],
 
             [
+                'urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"',
+                ['ComparisonExpression' => 'urn:ietf:params:scim:schemas:core:2.0:User : userName sw J'],
+            ],
+
+            [
                 'title pr',
                 ['ComparisonExpression' => 'title pr'],
             ],
@@ -246,7 +251,7 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
     public function error_provider_v2()
     {
         return [
-            ['not a valid filter', "[Syntax Error] line 0, col 4: Error: Expected PAREN_OPEN, got 'a'"],
+            ['none a valid filter', "[Syntax Error] line 0, col 5: Error: Expected comparision operator, got 'a'"],
             ['username xx "mike"', "[Syntax Error] line 0, col 9: Error: Expected comparision operator, got 'xx'"],
             ['username eq', "[Syntax Error] line 0, col 9: Error: Expected SP, got end of string."],
             ['username eq ', "[Syntax Error] line 0, col 11: Error: Expected comparison value, got end of string."],

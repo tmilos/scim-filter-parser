@@ -129,9 +129,9 @@ class Parser
 
         if ($this->lexer->isNextToken(Tokens::T_SP)) {
             $nextToken = $this->lexer->glimpse();
-            if ($nextToken && $nextToken->is(Tokens::T_OR)) {
+            if ($this->isName('or', $nextToken)) {
                 $this->match(Tokens::T_SP);
-                $this->match(Tokens::T_OR);
+                $this->match(Tokens::T_NAME);
                 $this->match(Tokens::T_SP);
                 $terms[] = $this->conjunction();
             }
@@ -154,9 +154,9 @@ class Parser
 
         if ($this->lexer->isNextToken(Tokens::T_SP)) {
             $nextToken = $this->lexer->glimpse();
-            if ($nextToken && $nextToken->is(Tokens::T_AND)) {
+            if ($this->isName('and', $nextToken)) {
                 $this->match(Tokens::T_SP);
-                $this->match(Tokens::T_AND);
+                $this->match(Tokens::T_NAME);
                 $this->match(Tokens::T_SP);
                 $factors[] = $this->factor();
             }
@@ -174,9 +174,9 @@ class Parser
      */
     private function factor()
     {
-        if ($this->lexer->isNextToken(Tokens::T_NOT)) {
+        if ($this->isName('not', $this->lexer->getLookahead())) {
             // not ( filter )
-            $this->match(Tokens::T_NOT);
+            $this->match(Tokens::T_NAME);
             $this->match(Tokens::T_SP);
             $this->match(Tokens::T_PAREN_OPEN);
             $filter = $this->disjunction();
@@ -236,22 +236,49 @@ class Parser
     }
 
     /**
-     * @param Ast\AttributePath $attributePath
-     *
      * @return Ast\AttributePath
      */
-    private function attributePath(Ast\AttributePath $attributePath = null)
+    private function attributePath()
     {
-        $this->match(Tokens::T_ATTR_NAME);
+        $string = '';
+        $valid = [Tokens::T_NUMBER, Tokens::T_NAME, Tokens::T_COLON, Tokens::T_SLASH, Tokens::T_DOT];
+        $stopping = [Tokens::T_SP, Tokens::T_BRACKET_OPEN];
 
-        if (!$attributePath) {
-            $attributePath = new Ast\AttributePath();
+        while (true) {
+            $token = $this->lexer->getLookahead();
+            if (!$token) {
+                break;
+            }
+            $isValid = in_array($token->getName(), $valid);
+            $isStopping = in_array($token->getName(), $stopping);
+            if ($isStopping) {
+                break;
+            }
+            if (!$isValid) {
+                $this->syntaxError('attribute path');
+            }
+            $string .= $token->getValue();
+            $this->lexer->moveNext();
         }
-        $attributePath->add($this->lexer->getToken()->getValue());
 
-        if ($this->lexer->isNextToken(Tokens::T_DOT)) {
-            $this->match(Tokens::T_DOT);
-            $this->attributePath($attributePath);
+        if (!$string) {
+            $this->syntaxError('attribute path');
+        }
+
+        $colonPos = strrpos($string, ':');
+        if ($colonPos !== false) {
+            $schema = substr($string, 0, $colonPos);
+            $path = substr($string, $colonPos + 1);
+        } else {
+            $schema = null;
+            $path = $string;
+        }
+
+        $parts = explode('.', $path);
+        $attributePath = new Ast\AttributePath();
+        $attributePath->schema = $schema;
+        foreach ($parts as $part) {
+            $attributePath->add($part);
         }
 
         return $attributePath;
@@ -262,9 +289,10 @@ class Parser
      */
     private function comparisonOperator()
     {
-        if (!$this->lexer->isNextTokenAny(Tokens::compareOperators())) {
+        if (!$this->isName(['pr', 'eq', 'ne', 'co', 'sw', 'ew', 'gt', 'lt', 'ge', 'le'], $this->lexer->getLookahead())) {
             $this->syntaxError('comparision operator');
         }
+
         $this->match($this->lexer->getLookahead()->getName());
 
         return $this->lexer->getToken()->getValue();
@@ -275,9 +303,13 @@ class Parser
      */
     private function compareValue()
     {
-        if (!$this->lexer->isNextTokenAny(Tokens::compareValues())) {
+        if (!$this->lexer->isNextTokenAny([Tokens::T_NAME, Tokens::T_NUMBER, Tokens::T_STRING])) {
             $this->syntaxError('comparison value');
         }
+        if ($this->lexer->getLookahead()->is(Tokens::T_NAME) && !$this->isName(['true', 'false', 'null'], $this->lexer->getLookahead())) {
+            $this->syntaxError('comparision value');
+        }
+
         $this->match($this->lexer->getLookahead()->getName());
 
         $value = json_decode($this->lexer->getToken()->getValue());
@@ -306,10 +338,38 @@ class Parser
      */
     private function isValuePathIncoming()
     {
-        $tokenAfterAttributePath = $this->lexer->peekWhileTokens([Tokens::T_ATTR_NAME, Tokens::T_DOT]);
+        $tokenAfterAttributePath = $this->lexer->peekWhileTokens([Tokens::T_NAME, Tokens::T_DOT]);
         $this->lexer->resetPeek();
 
         return $tokenAfterAttributePath ? $tokenAfterAttributePath->is(Tokens::T_BRACKET_OPEN) : false;
+    }
+
+    /**
+     * @param string|string[] $value
+     * @param Token|null      $token
+     *
+     * @return bool
+     */
+    private function isName($value, $token)
+    {
+        if (!$token) {
+            return false;
+        }
+        if (!$token->is(Tokens::T_NAME)) {
+            return false;
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                if (strcasecmp($token->getValue(), $v) === 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return strcasecmp($token->getValue(), $value) === 0;
     }
 
     private function match($tokenName)
