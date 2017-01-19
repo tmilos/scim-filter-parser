@@ -19,8 +19,44 @@ class AttributePath extends Node
     /** @var string[] */
     public $attributeNames = [];
 
+    /**
+     * @param string $string
+     *
+     * @return AttributePath
+     */
+    public static function fromString($string)
+    {
+        $string = trim($string);
+        if (!$string) {
+            throw new \InvalidArgumentException('Empty attribute path');
+        }
+
+        $colonPos = strrpos($string, ':');
+        if ($colonPos !== false) {
+            $schema = substr($string, 0, $colonPos);
+            $path = substr($string, $colonPos + 1);
+        } else {
+            $schema = null;
+            $path = $string;
+        }
+
+        $parts = explode('.', $path);
+        $attributePath = new static();
+        $attributePath->schema = $schema;
+        foreach ($parts as $part) {
+            $attributePath->add($part);
+        }
+
+        return $attributePath;
+    }
+
     public function add($attributeName)
     {
+        $firstLetter = strtolower(substr($attributeName, 0, 1));
+        if ($firstLetter < 'a' || $firstLetter > 'z') {
+            throw new \InvalidArgumentException(sprintf('Invalid attribute name "%s"', $attributeName));
+        }
+
         $this->attributeNames[] = $attributeName;
     }
 

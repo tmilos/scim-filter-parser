@@ -265,23 +265,7 @@ class Parser
             $this->syntaxError('attribute path');
         }
 
-        $colonPos = strrpos($string, ':');
-        if ($colonPos !== false) {
-            $schema = substr($string, 0, $colonPos);
-            $path = substr($string, $colonPos + 1);
-        } else {
-            $schema = null;
-            $path = $string;
-        }
-
-        $parts = explode('.', $path);
-        $attributePath = new Ast\AttributePath();
-        $attributePath->schema = $schema;
-        foreach ($parts as $part) {
-            $attributePath->add($part);
-        }
-
-        return $attributePath;
+        return Ast\AttributePath::fromString($string);
     }
 
     /**
