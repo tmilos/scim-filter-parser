@@ -37,7 +37,7 @@ Conjunction = {
 
 ```php
 <?php
-$parser = new Parser(Mode::FILTER());
+$parser = new Parser(Mode::PATH());
 $node = $parser->parse('members[value eq "2819c223-7f76-453a-919d-413861904646"].displayName');
 /*
 walk the node...
