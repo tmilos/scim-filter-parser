@@ -47,15 +47,15 @@ class ValuePath extends Factor
 
     public function __toString()
     {
-        return sprintf('%s[%s]', $this->attributePath, $this->filter);
+        return sprintf('%s[%s]', $this->getAttributePath(), $this->getFilter());
     }
 
     public function dump()
     {
         return [
             'ValuePath' => [
-                $this->attributePath->dump(),
-                $this->filter->dump(),
+                $this->getAttributePath()->dump(),
+                $this->getFilter()->dump(),
             ],
         ];
     }
