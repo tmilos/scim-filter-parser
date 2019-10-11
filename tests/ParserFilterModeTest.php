@@ -218,7 +218,23 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-
+            [
+                'username eq "john" and ((name sw "mike" or id ew "123") or name eq "alina")',
+                [
+                    'Conjunction' => [
+                        ['ComparisonExpression' => 'username eq john'],
+                        [
+                            'Disjunction' => [
+                                'Disjunction' => [
+                                    ['ComparisonExpression' => 'name sw mike'],
+                                    ['ComparisonExpression' => 'id ew 123'],
+                                ],
+                                ['ComparisonExpression' => 'name eq alina']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             [
                 'username eq "john" and not (name sw "mike" or id ew "123")',
                 [
