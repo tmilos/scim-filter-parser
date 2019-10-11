@@ -219,19 +219,21 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'username eq "john" and ((name sw "mike" or id ew "123") or name eq "alina")',
+                '((name eq "mike" or id eq "123") or name eq "alina") and username eq "john"',
                 [
                     'Conjunction' => [
-                        ['ComparisonExpression' => 'username eq john'],
                         [
                             'Disjunction' => [
-                                'Disjunction' => [
-                                    ['ComparisonExpression' => 'name sw mike'],
-                                    ['ComparisonExpression' => 'id ew 123'],
+                                [
+                                    'Disjunction' => [
+                                        ['ComparisonExpression' => 'name eq mike'],
+                                        ['ComparisonExpression' => 'id eq 123'],
+                                    ]
                                 ],
                                 ['ComparisonExpression' => 'name eq alina']
                             ]
-                        ]
+                        ],
+                        ['ComparisonExpression' => 'username eq john']
                     ]
                 ]
             ],
@@ -261,6 +263,7 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
     {
         $parser = $this->getParser();
         $node = $parser->parse($filterString);
+
         $this->assertEquals($expectedDump, $node->dump(), sprintf("\n\n%s\n%s\n\n", $filterString, json_encode($node->dump(), JSON_PRETTY_PRINT)));
     }
 
