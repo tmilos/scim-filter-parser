@@ -29,33 +29,17 @@ class ValuePath extends Factor
         $this->filter = $filter;
     }
 
-    /**
-     * @return AttributePath
-     */
-    public function getAttributePath()
-    {
-        return $this->attributePath;
-    }
-
-    /**
-     * @return Filter
-     */
-    public function getFilter()
-    {
-        return $this->filter;
-    }
-
     public function __toString()
     {
-        return sprintf('%s[%s]', $this->getAttributePath(), $this->getFilter());
+        return sprintf('%s[%s]', $this->attributePath, $this->filter);
     }
 
     public function dump()
     {
         return [
             'ValuePath' => [
-                $this->getAttributePath()->dump(),
-                $this->getFilter()->dump(),
+                $this->attributePath->dump(),
+                $this->filter->dump(),
             ],
         ];
     }
