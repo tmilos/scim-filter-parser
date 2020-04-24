@@ -13,11 +13,11 @@ namespace Tmilos\ScimFilterParser\Ast;
 
 class Disjunction extends Filter
 {
-    /** @var Term[] */
+    /** @var Filter[] */
     private $terms = [];
 
     /**
-     * @param Term[] $terms
+     * @param Filter[] $terms
      */
     public function __construct(array $terms = [])
     {
@@ -27,15 +27,15 @@ class Disjunction extends Filter
     }
 
     /**
-     * @param Term $term
+     * @param Filter $term
      */
-    public function add(Term $term)
+    public function add(Filter $term)
     {
         $this->terms[] = $term;
     }
 
     /**
-     * @return Term[]
+     * @return Filter[]
      */
     public function getTerms()
     {

@@ -64,4 +64,20 @@ class Path extends Node
             return array_merge($this->valuePath->dump(), $this->attributePath->dump());
         }
     }
+
+    /**
+     * @return AttributePath
+     */
+    public function getAttributePath()
+    {
+        return $this->attributePath;
+    }
+
+    /**
+     * @return ValuePath
+     */
+    public function getValuePath()
+    {
+        return $this->valuePath;
+    }
 }

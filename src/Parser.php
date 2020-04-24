@@ -127,13 +127,16 @@ class Parser
         $terms = [];
         $terms[] = $this->conjunction();
 
-        if ($this->lexer->isNextToken(Tokens::T_SP)) {
+        $isNextTokenOr = true;
+        while($this->lexer->isNextToken(Tokens::T_SP) && $isNextTokenOr) {
             $nextToken = $this->lexer->glimpse();
             if ($this->isName('or', $nextToken)) {
                 $this->match(Tokens::T_SP);
                 $this->match(Tokens::T_NAME);
                 $this->match(Tokens::T_SP);
                 $terms[] = $this->conjunction();
+            } else {
+                $isNextTokenOr = false;
             }
         }
 
@@ -152,13 +155,16 @@ class Parser
         $factors = [];
         $factors[] = $this->factor();
 
-        if ($this->lexer->isNextToken(Tokens::T_SP)) {
+        $isNextTokenAnd = true;
+        while($this->lexer->isNextToken(Tokens::T_SP) && $isNextTokenAnd) {
             $nextToken = $this->lexer->glimpse();
             if ($this->isName('and', $nextToken)) {
                 $this->match(Tokens::T_SP);
                 $this->match(Tokens::T_NAME);
                 $this->match(Tokens::T_SP);
                 $factors[] = $this->factor();
+            } else {
+                $isNextTokenAnd = false;
             }
         }
 
