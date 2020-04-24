@@ -54,8 +54,8 @@ class ValuePath extends Factor
     {
         return [
             'ValuePath' => [
-                $this->getAttributePath()->dump(),
-                $this->getFilter()->dump(),
+                $this->attributePath->dump(),
+                $this->filter->dump(),
             ],
         ];
     }
