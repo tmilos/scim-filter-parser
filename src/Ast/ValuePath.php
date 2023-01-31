@@ -14,10 +14,10 @@ namespace Tmilos\ScimFilterParser\Ast;
 class ValuePath extends Factor
 {
     /** @var AttributePath */
-    private $attributePath;
+    public $attributePath;
 
     /** @var Filter */
-    private $filter;
+    public $filter;
 
     /**
      * @param AttributePath $attributePath
