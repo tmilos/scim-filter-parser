@@ -218,7 +218,25 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-
+            [
+                '((name eq "mike" or id eq "123") or name eq "alina") and username eq "john"',
+                [
+                    'Conjunction' => [
+                        [
+                            'Disjunction' => [
+                                [
+                                    'Disjunction' => [
+                                        ['ComparisonExpression' => 'name eq mike'],
+                                        ['ComparisonExpression' => 'id eq 123'],
+                                    ]
+                                ],
+                                ['ComparisonExpression' => 'name eq alina']
+                            ]
+                        ],
+                        ['ComparisonExpression' => 'username eq john']
+                    ]
+                ]
+            ],
             [
                 'username eq "john" and not (name sw "mike" or id ew "123")',
                 [
@@ -235,6 +253,60 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            [
+                'emails co "example.com" and emails.value co "example.org" and emails.value co "example.info"',
+                [
+                    'Conjunction' => [
+                        ['ComparisonExpression' => 'emails co example.com'],
+                        ['ComparisonExpression' => 'emails.value co example.org'],
+                        ['ComparisonExpression' => 'emails.value co example.info'],
+                    ]
+                ]
+            ],
+            [
+                'emails co "example.com" or emails.value co "example.org" or emails.value co "example.info"',
+                [
+                    'Disjunction' => [
+                        ['ComparisonExpression' => 'emails co example.com'],
+                        ['ComparisonExpression' => 'emails.value co example.org'],
+                        ['ComparisonExpression' => 'emails.value co example.info'],
+                    ]
+                ]
+            ],
+            [
+                'emails co "example.com" or emails.value co "example.org" or emails.value co "example.info" or (emails co "example.com" and emails.value co "example.org" and emails.value co "example.info")',
+                [
+                    'Disjunction' => [
+                        ['ComparisonExpression' => 'emails co example.com'],
+                        ['ComparisonExpression' => 'emails.value co example.org'],
+                        ['ComparisonExpression' => 'emails.value co example.info'],
+                        [
+                            'Conjunction' => [
+                                ['ComparisonExpression' => 'emails co example.com'],
+                                ['ComparisonExpression' => 'emails.value co example.org'],
+                                ['ComparisonExpression' => 'emails.value co example.info'],
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'emails co "example.com" or emails.value co "example.org" or emails.value co "example.info" or emails co "example.com" and emails.value co "example.org" and emails.value co "example.info"',
+                [
+                    'Disjunction' => [
+                        ['ComparisonExpression' => 'emails co example.com'],
+                        ['ComparisonExpression' => 'emails.value co example.org'],
+                        ['ComparisonExpression' => 'emails.value co example.info'],
+                        [
+                            'Conjunction' => [
+                                ['ComparisonExpression' => 'emails co example.com'],
+                                ['ComparisonExpression' => 'emails.value co example.org'],
+                                ['ComparisonExpression' => 'emails.value co example.info'],
+                            ]
+                        ]
+                    ]
+                ]
+            ],
         ];
     }
 
@@ -245,6 +317,7 @@ class ParserFilterModeTest extends \PHPUnit_Framework_TestCase
     {
         $parser = $this->getParser();
         $node = $parser->parse($filterString);
+
         $this->assertEquals($expectedDump, $node->dump(), sprintf("\n\n%s\n%s\n\n", $filterString, json_encode($node->dump(), JSON_PRETTY_PRINT)));
     }
 
