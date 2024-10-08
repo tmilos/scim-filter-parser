@@ -14,10 +14,10 @@ namespace Tmilos\ScimFilterParser\Ast;
 class Path extends Node
 {
     /** @var AttributePath */
-    private $attributePath;
+    public $attributePath;
 
     /** @var ValuePath */
-    private $valuePath;
+    public $valuePath;
 
     /**
      * @param AttributePath $attributePath
